@@ -1,6 +1,3 @@
-Here is a professional `README.md` template tailored for your evaluation. Create a new file named `README.md` in your project folder, paste this content into it, and save it.
-
----
 
 ## Project Overview
 
@@ -31,7 +28,6 @@ This is a lightweight, full-stack appointment scheduling application built to he
 
 * **Completion State:** Completed appointments permanently lock their time slot to retain accurate historical booking integrity.
 * **Architecture Scope:** The system logic is designed around a single shared team calendar where concurrent, overlapping active tasks are not permitted.
-
 
 
 Don't forget to replace `YOUR_USERNAME` in the setup steps with your actual GitHub username!
