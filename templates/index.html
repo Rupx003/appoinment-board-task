@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Appointment Board</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text: #0f172a;
+            --muted: #64748b;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --warning: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        /* Flash alerts */
+        .alerts {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Filter Bar */
+        .filters {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        /* Grid */
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .card.cancelled {
+            opacity: 0.65;
+            background: #f1f5f9;
+            border-left: 4px solid var(--danger);
+        }
+
+        .card.completed {
+            border-left: 4px solid var(--success);
+        }
+
+        .card.scheduled {
+            border-left: 4px solid var(--primary);
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-scheduled {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: auto;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .card-actions button {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 450px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Team Appointment Board</h1>
+                <p style="color: var(--muted); font-size: 0.875rem;">Manage, view, and organize daily team schedules.
+                </p>
+            </div>
+            <button class="btn" onclick="openAddModal()">+ Add Appointment</button>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alerts">
+            {% for category, msg in messages %}
+            <div class="alert alert-{{ category }}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="GET" action="/" class="filters">
+            <div class="form-group">
+                <label>Filter Date</label>
+                <input type="date" name="date" value="{{ filter_date }}">
+            </div>
+            <div class="form-group">
+                <label>Filter Status</label>
+                <select name="status">
+                    <option value="">All Statuses</option>
+                    <option value="Scheduled" {% if filter_status=='Scheduled' %}selected{% endif %}>Scheduled</option>
+                    <option value="Completed" {% if filter_status=='Completed' %}selected{% endif %}>Completed</option>
+                    <option value="Cancelled" {% if filter_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">Apply Filters</button>
+            <a href="/" class="btn btn-secondary" style="text-decoration: none;">Reset</a>
+        </form>
+
+        <div class="board-grid">
+            {% for item in appointments %}
+            <div class="card {{ item.status.lower() }}">
+                <div>
+                    <div class="card-meta">
+                        <span class="badge badge-{{ item.status.lower() }}">{{ item.status }}</span>
+                        <small style="color: var(--muted); font-weight: 500;">{{ item.date }}</small>
+                    </div>
+                    <h2 style="font-size: 1.125rem; margin-top: 0.5rem;">{{ item.title }}</h2>
+                    <p style="font-size: 0.8125rem; color: var(--muted); margin: 0.25rem 0;">🕒 {{ item.start_time }} -
+                        {{ item.end_time }}</p>
+                    <p style="font-size: 0.875rem; margin-top: 0.5rem;">{{ item.description or 'No description
+                        provided.' }}</p>
+                </div>
+
+                <div class="card-actions">
+                    {% if item.status != 'Cancelled' %}
+                    <button class="btn btn-secondary" data-id="{{ item.id }}" data-title="{{ item.title }}"
+                        data-desc="{{ item.description or '' }}" data-date="{{ item.date }}"
+                        data-start="{{ item.start_time }}" data-end="{{ item.end_time }}" onclick="openEditModal(this)">
+                        Edit
+                    </button>
+                    {% if item.status != 'Completed' %}
+                    <form action="/appointment/{{ item.id }}/complete" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-success">Complete</button>
+                    </form>
+                    {% endif %}
+                    <form action="/appointment/{{ item.id }}/cancel" method="POST" style="display:inline;"
+                        onsubmit="return confirm('Cancel this appointment?');">
+                        <button type="submit" class="btn-danger">Cancel</button>
+                    </form>
+                    {% else %}
+                    <span style="font-size: 0.75rem; color: var(--danger); font-weight: 500;">Slot Released</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 2rem;">No appointments
+                found matching current filters.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="formModal" class="modal-backdrop">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="margin-bottom: 1rem;">Add Appointment</h3>
+            <form id="apptForm" method="POST" action="/appointment/add">
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label>Title *</label>
+                    <input type="text" name="title" id="formTitle" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label>Description</label>
+                    <textarea name="description" id="formDesc" rows="2"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label>Date *</label>
+                    <input type="date" name="date" id="formDate" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.25rem;">
+                    <div class="form-group">
+                        <label>Start Time *</label>
+                        <input type="time" name="start_time" id="formStartTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Time *</label>
+                        <input type="time" name="end_time" id="formEndTime" required>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
+                    <button type="submit" class="btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('formModal');
+        const form = document.getElementById('apptForm');
+
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = 'Add Appointment';
+            form.action = '/appointment/add';
+            form.reset();
+            modal.classList.add('open');
+        }
+
+        function openEditModal(button) {
+            document.getElementById('modalTitle').innerText = 'Edit Appointment';
+            form.action = `/appointment/${button.dataset.id}/edit`;
+            document.getElementById('formTitle').value = button.dataset.title;
+            document.getElementById('formDesc').value = button.dataset.desc;
+            document.getElementById('formDate').value = button.dataset.date;
+            document.getElementById('formStartTime').value = button.dataset.start;
+            document.getElementById('formEndTime').value = button.dataset.end;
+            modal.classList.add('open');
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+        }
+    </script>
+</body>
+
+</html>
