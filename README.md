@@ -30,6 +30,16 @@ This is a lightweight, full-stack appointment scheduling application built to he
 * **Architecture Scope:** The system logic is designed around a single shared team calendar where concurrent, overlapping active tasks are not permitted.
 
 
-Don't forget to replace `YOUR_USERNAME` in the setup steps with your actual GitHub username!
 
-Are you familiar with the specific terminal commands needed to commit and push this new file up to your GitHub repository?
+Local Setup Guide
+Clone the repository locally using git clone [https://github.com/Rupx003/appointment-board-task.git](https://github.com/Rupx003/appointment-board-task.git).
+
+Navigate into the newly created directory and generate a virtual environment by running python -m venv venv.
+
+Activate the virtual environment (venv\Scripts\activate on Windows, or source venv/bin/activate on macOS/Linux).
+
+Install all required project dependencies by running pip install -r requirements.txt.
+
+Start the local Flask server by executing python app.py.
+
+Open your preferred web browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000) to view the application.
